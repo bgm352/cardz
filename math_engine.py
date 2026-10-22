@@ -44,14 +44,11 @@ def evaluate_card_deal(card: dict, watch_cfg: dict) -> dict | None:
   if gem_rate >= MIN_GEM_RATE_FLOOR:
     if multiplier < 2.8 or psa10_net_profit < 280:
       return None
-    gem_badge = f"🎯 **Gem Rate:** `{gem_rate*100:.1f}%` ✅ *(Clears 40% Floor)*"
+    gem_badge = "🎯 Gem Rate: " + str(int(gem_rate * 100)) + "% (Clears Floor)"
   elif gem_rate >= UNICORN_MIN_GEM_RATE:
     if multiplier < 3.3 or psa10_net_profit < 650 or psa9_net_profit < -10:
       return None
-    gem_badge = (
-        f"🦄 **Gem Rate:** `{gem_rate*100:.1f}%` *(Unicorn Exception:"
-        f" +${psa10_net_profit:.0f} Net!)*"
-    )
+    gem_badge = "🦄 Gem Rate: " + str(int(gem_rate * 100)) + "% (Unicorn)"
   else:
     return None
 
@@ -65,38 +62,28 @@ def evaluate_card_deal(card: dict, watch_cfg: dict) -> dict | None:
 
   if raw_price <= green_buy_max:
     zone_status = "🟢 GREEN ZONE: INSTANT BUY"
-    action_text = (
-        f"BUY NOW AT ${raw_price:.2f} (Under${green_buy_max:.2f} Target)"
-    )
+    action_text = "BUY NOW AT $" + str(raw_price)
   else:
     zone_status = "🟡 YELLOW ZONE: OFFER ONLY"
-    action_text = f"FIRE OFFER OF ${target_offer:.2f} (Walk Away >${walk_away_ceiling:.2f})"
+    action_text = "FIRE OFFER"
 
   return_date = (datetime.now() + timedelta(days=t["cal_days"])).strftime(
       "%b %d, %Y"
   )
-  next_orders = round(psa10_net_payout / all_in, 1)
-  skim_amt = round(psa10_net_profit * 0.45)
-  roll_amt = round(psa10_net_payout - skim_amt)
 
   alert_summary = (
-      f"{zone_status}\n"
-      f"🃏 **{card['title']}**\n"
-      f"💵 **All-In:** `${raw_price:.2f} Raw` + `${psa_fee:.2f} PSA"
-      f" {tier_name}` = **`${all_in:.2f}`**\n"
-      f"🎯 **Price Zones:** Green `<=${green_buy_max:.0f}` | Offer"
-      f" `${target_offer:.0f}` | Walk-Away `>${walk_away_ceiling:.0f}`\n"
-      f"💎 **PSA 10 Floor:** **`${psa10_floor:,.2f}`**"
-      f" *(+${psa10_net_profit:,.2f} Net \vert{} **${roti_hr:,}/hr**)*\n"
-      f"{gem_badge}\n"
-      f"📉 **Crash Buffer:** Survives **-{max_drop_pct}%** drop! *(At -30%:"
-      f" Still **+${crashed_30_net:.0f} Net**)*\n"
-      f"🛡️ **PSA 9 Floor:** `${psa9_floor:.2f}` *(+${psa9_net_profit:.2f}"
-      " Net)*\n"
-      f"⏱️ **Payback:** **{t['cal_days']} Days ({return_date})** —"
-      f" *{t['tat_bus_days']} bus. days*\n"
-      f"🔄 **Self-Funding:** Funds **{next_orders}x orders FREE** *(Skim"
-      f" +${skim_amt} Mortgage / Roll {roll_amt})*"
+      zone_status
+      + "\n🃏 "
+      + str(card["title"])
+      + "\n💵 All-In: $"
+      + str(all_in)
+      + "\n💎 PSA 10 Floor: $"
+      + str(psa10_floor)
+      + " (Net: $"
+      + str(psa10_net_profit)
+      + ")"
+      + "\n⏱️ Payback: "
+      + return_date
   )
 
   return {
